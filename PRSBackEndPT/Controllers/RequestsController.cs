@@ -11,47 +11,47 @@ namespace PRSBackEndPT.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VendorsController : ControllerBase
+    public class RequestsController : ControllerBase
     {
         private readonly PrsDbContext _context;
 
-        public VendorsController(PrsDbContext context)
+        public RequestsController(PrsDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Vendors
+        // GET: api/Requests
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Vendor>>> GetVendors()
+        public async Task<ActionResult<IEnumerable<Request>>> GetRequest()
         {
-            return await _context.Vendors.ToListAsync();
+            return await _context.Request.ToListAsync();
         }
 
-        // GET: api/Vendors/5
+        // GET: api/Requests/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Vendor>> GetVendor(int id)
+        public async Task<ActionResult<Request>> GetRequest(int id)
         {
-            var vendor = await _context.Vendors.FindAsync(id);
+            var request = await _context.Request.FindAsync(id);
 
-            if (vendor == null)
+            if (request == null)
             {
                 return NotFound();
             }
 
-            return vendor;
+            return request;
         }
 
-        // PUT: api/Vendors/5
+        // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutVendor(int id, Vendor vendor)
+        public async Task<IActionResult> PutRequest(int id, Request request)
         {
-            if (id != vendor.Id)
+            if (id != request.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(vendor).State = EntityState.Modified;
+            _context.Entry(request).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!VendorExists(id))
+                if (!RequestExists(id))
                 {
                     return NotFound();
                 }
@@ -72,36 +72,36 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Vendors
+        // POST: api/Requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Vendor>> PostVendor(Vendor vendor)
+        public async Task<ActionResult<Request>> PostRequest(Request request)
         {
-            _context.Vendors.Add(vendor);
+            _context.Request.Add(request);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVendor", new { id = vendor.Id }, vendor);
+            return CreatedAtAction("GetRequest", new { id = request.Id }, request);
         }
 
-        // DELETE: api/Vendors/5
+        // DELETE: api/Requests/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVendor(int id)
+        public async Task<IActionResult> DeleteRequest(int id)
         {
-            var vendor = await _context.Vendors.FindAsync(id);
-            if (vendor == null)
+            var request = await _context.Request.FindAsync(id);
+            if (request == null)
             {
                 return NotFound();
             }
 
-            _context.Vendors.Remove(vendor);
+            _context.Request.Remove(request);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool VendorExists(int id)
+        private bool RequestExists(int id)
         {
-            return _context.Vendors.Any(e => e.Id == id);
+            return _context.Request.Any(e => e.Id == id);
         }
     }
 }

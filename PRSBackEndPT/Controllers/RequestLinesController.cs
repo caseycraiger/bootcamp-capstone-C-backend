@@ -11,47 +11,47 @@ namespace PRSBackEndPT.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VendorsController : ControllerBase
+    public class RequestLinesController : ControllerBase
     {
         private readonly PrsDbContext _context;
 
-        public VendorsController(PrsDbContext context)
+        public RequestLinesController(PrsDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Vendors
+        // GET: api/RequestLines
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Vendor>>> GetVendors()
+        public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLine()
         {
-            return await _context.Vendors.ToListAsync();
+            return await _context.RequestLine.ToListAsync();
         }
 
-        // GET: api/Vendors/5
+        // GET: api/RequestLines/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Vendor>> GetVendor(int id)
+        public async Task<ActionResult<RequestLine>> GetRequestLine(int id)
         {
-            var vendor = await _context.Vendors.FindAsync(id);
+            var requestLine = await _context.RequestLine.FindAsync(id);
 
-            if (vendor == null)
+            if (requestLine == null)
             {
                 return NotFound();
             }
 
-            return vendor;
+            return requestLine;
         }
 
-        // PUT: api/Vendors/5
+        // PUT: api/RequestLines/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutVendor(int id, Vendor vendor)
+        public async Task<IActionResult> PutRequestLine(int id, RequestLine requestLine)
         {
-            if (id != vendor.Id)
+            if (id != requestLine.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(vendor).State = EntityState.Modified;
+            _context.Entry(requestLine).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!VendorExists(id))
+                if (!RequestLineExists(id))
                 {
                     return NotFound();
                 }
@@ -72,36 +72,36 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Vendors
+        // POST: api/RequestLines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Vendor>> PostVendor(Vendor vendor)
+        public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
         {
-            _context.Vendors.Add(vendor);
+            _context.RequestLine.Add(requestLine);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetVendor", new { id = vendor.Id }, vendor);
+            return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
         }
 
-        // DELETE: api/Vendors/5
+        // DELETE: api/RequestLines/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVendor(int id)
+        public async Task<IActionResult> DeleteRequestLine(int id)
         {
-            var vendor = await _context.Vendors.FindAsync(id);
-            if (vendor == null)
+            var requestLine = await _context.RequestLine.FindAsync(id);
+            if (requestLine == null)
             {
                 return NotFound();
             }
 
-            _context.Vendors.Remove(vendor);
+            _context.RequestLine.Remove(requestLine);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool VendorExists(int id)
+        private bool RequestLineExists(int id)
         {
-            return _context.Vendors.Any(e => e.Id == id);
+            return _context.RequestLine.Any(e => e.Id == id);
         }
     }
 }

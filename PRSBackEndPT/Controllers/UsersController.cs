@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PRSBackEndPT;
 using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
@@ -19,6 +18,20 @@ namespace PRSBackEndPT.Controllers
         public UsersController(PrsDbContext context)
         {
             _context = context;
+        }
+
+        [Route("/login")]
+        [HttpPost]
+        public async Task<ActionResult<User>> LoginUser([FromBody] UserPasswordObject upo)
+        {
+            var user = await _context.Users.Where(u => u.UserName == upo.username && u.Password == upo.password).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound();  // 404
+            }
+
+            return user;  // best practice: only return what's needed!
         }
 
         // GET: api/Users

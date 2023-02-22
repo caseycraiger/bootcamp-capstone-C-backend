@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PRSBackEndPT
+namespace PRSBackEndPT.models
 {
     public class Product
     {
@@ -13,6 +14,7 @@ namespace PRSBackEndPT
         [StringLength(30)]
         public string Name { get; set; }
 
+        [Column(TypeName = "Decimal (11,2)")]
         public decimal Price { get; set; }
 
         [StringLength(30)]
@@ -22,6 +24,7 @@ namespace PRSBackEndPT
         public string? PhotoPath { get; set; }
 
         public int VendorId { get; set; }
+        public virtual Vendor? Vendor { get; set; }
 
     }
 }

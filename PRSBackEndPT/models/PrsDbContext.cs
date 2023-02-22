@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.models
 {
@@ -11,5 +12,9 @@ namespace PRSBackEndPT.models
         public PrsDbContext(DbContextOptions<PrsDbContext> options) : base(options)
         {
         }
+
+        public DbSet<PRSBackEndPT.models.Request> Request { get; set; }
+
+        public DbSet<PRSBackEndPT.models.RequestLine> RequestLine { get; set; }
     }
 }

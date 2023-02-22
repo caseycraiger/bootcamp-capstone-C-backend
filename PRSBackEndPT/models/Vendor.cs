@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PRSBackEndPT
+namespace PRSBackEndPT.models
 {
     public class Vendor
     {
