@@ -12,7 +12,7 @@ namespace PRSBackEndPT.models
         public string Description { get; set; }
 
         [StringLength(80)]
-        public string Justitification { get; set; }
+        public string Justification { get; set; }
 
         [StringLength(80)]
         public string? RejectionReason { get; set; }
@@ -32,5 +32,10 @@ namespace PRSBackEndPT.models
 
         public int UserId { get; set; }
         public virtual User? User { get; set; }
+
+        internal double getTotal()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
