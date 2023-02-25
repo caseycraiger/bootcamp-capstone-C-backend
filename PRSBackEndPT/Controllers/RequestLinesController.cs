@@ -37,6 +37,7 @@ namespace PRSBackEndPT.Controllers
             {
                 return NotFound();
             }
+            requestLine.Product = await _context.Products.FindAsync(requestLine.ProductId);
 
             return requestLine;
         }

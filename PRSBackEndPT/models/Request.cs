@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PRSBackEndPT.models
@@ -31,7 +32,11 @@ namespace PRSBackEndPT.models
         public decimal Total { get; set; }
 
         public int UserId { get; set; }
-        public virtual User? User { get; set; }
+
+        // EF Relation property
+        // [ForeignKey(nameof(UserId))] // User - UserId
+        [JsonIgnore]
+        public User User { get; set; }
 
         internal double getTotal()
         {

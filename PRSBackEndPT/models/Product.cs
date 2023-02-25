@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PRSBackEndPT.models
@@ -24,7 +25,9 @@ namespace PRSBackEndPT.models
         public string? PhotoPath { get; set; }
 
         public int VendorId { get; set; }
-        public virtual Vendor? Vendor { get; set; }
+
+        [JsonIgnore]
+        public Vendor? Vendor { get; set; }
 
     }
 }
