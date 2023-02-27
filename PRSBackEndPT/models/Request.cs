@@ -31,11 +31,12 @@ namespace PRSBackEndPT.models
         [Column(TypeName = "Decimal (11,2)")]
         public decimal Total { get; set; }
 
+        [JsonIgnore]
         public int UserId { get; set; }
 
         // EF Relation property
         // [ForeignKey(nameof(UserId))] // User - UserId
-        [JsonIgnore]
+       
         public User User { get; set; }
 
         internal double getTotal()

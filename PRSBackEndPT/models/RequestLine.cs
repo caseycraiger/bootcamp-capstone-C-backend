@@ -9,14 +9,16 @@ namespace PRSBackEndPT.models
         [Key]
         public int Id { get; set; }
 
+        [JsonIgnore]
         public int RequestId { get; set; }
-        
-        public int ProductId { get; set; }
-        
-        public int Quantity { get; set; }
 
         [JsonIgnore]
+        public int ProductId { get; set; }
+
+        public int Quantity { get; set; }
+        
         public Product? Product { get; set; }
+
         public Request? Request { get; set; }
     }
 }

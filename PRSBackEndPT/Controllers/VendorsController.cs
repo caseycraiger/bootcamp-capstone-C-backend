@@ -9,7 +9,7 @@ using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/vendors")]
     [ApiController]
     public class VendorsController : ControllerBase
     {
@@ -20,14 +20,14 @@ namespace PRSBackEndPT.Controllers
             _context = context;
         }
 
-        // GET: api/Vendors
+        // GET: /vendors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Vendor>>> GetVendors()
         {
             return await _context.Vendors.ToListAsync();
         }
 
-        // GET: api/Vendors/5
+        // GET: /vendors/(id)
         [HttpGet("{id}")]
         public async Task<ActionResult<Vendor>> GetVendor(int id)
         {
@@ -41,16 +41,22 @@ namespace PRSBackEndPT.Controllers
             return vendor;
         }
 
-        // PUT: api/Vendors/5
+        // POST: /vendors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutVendor(int id, Vendor vendor)
+        [HttpPost]
+        public async Task<ActionResult<Vendor>> PostVendor(Vendor vendor)
         {
-            if (id != vendor.Id)
-            {
-                return BadRequest();
-            }
+            _context.Vendors.Add(vendor);
+            await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetVendor", new { id = vendor.Id }, vendor);
+        }
+
+        // PUT: /vendors
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        public async Task<IActionResult> PutVendor(Vendor vendor)
+        {
             _context.Entry(vendor).State = EntityState.Modified;
 
             try
@@ -59,7 +65,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!VendorExists(id))
+                if (!VendorExists(vendor.Id))
                 {
                     return NotFound();
                 }
@@ -72,18 +78,7 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Vendors
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Vendor>> PostVendor(Vendor vendor)
-        {
-            _context.Vendors.Add(vendor);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetVendor", new { id = vendor.Id }, vendor);
-        }
-
-        // DELETE: api/Vendors/5
+        // DELETE: vendors/(id)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVendor(int id)
         {

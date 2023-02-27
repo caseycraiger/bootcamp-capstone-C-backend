@@ -9,7 +9,7 @@ using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -34,14 +34,14 @@ namespace PRSBackEndPT.Controllers
             return user;  // best practice: only return what's needed!
         }
 
-        // GET: api/Users
+        // GET: /users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
+        // GET: /users/(id)
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
@@ -55,16 +55,22 @@ namespace PRSBackEndPT.Controllers
             return user;
         }
 
-        // PUT: api/Users/5
+        // POST: /users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        [HttpPost]
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
+
+        // PUT: /users
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        public async Task<IActionResult> PutUser(User user)
+        {
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -73,7 +79,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!UserExists(user.Id))
                 {
                     return NotFound();
                 }
@@ -86,18 +92,7 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
-        // DELETE: api/Users/5
+        // DELETE: /users/(id)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

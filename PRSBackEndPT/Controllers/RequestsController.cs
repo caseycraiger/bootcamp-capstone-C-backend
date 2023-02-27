@@ -11,7 +11,7 @@ using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/requests")]
     [ApiController]
     public class RequestsController : ControllerBase
     {
@@ -27,14 +27,14 @@ namespace PRSBackEndPT.Controllers
             _context = context;
         }
 
-        // GET: api/Requests
+        // GET: /requests
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
         {
             return await _context.Requests.Include(r => r.User).ToListAsync();
         }
 
-        // GET: api/Requests/5
+        // GET: /requests/(id)
         [HttpGet("{id}")]
         public async Task<ActionResult<Request>> GetRequest(int id)
         {
@@ -44,6 +44,7 @@ namespace PRSBackEndPT.Controllers
                 .Include(r => r.User)
                 .FirstOrDefaultAsync();
 
+
             if (request == null)
             {
                 return NotFound();
@@ -51,16 +52,22 @@ namespace PRSBackEndPT.Controllers
             return request;
         }
 
-        // PUT: api/Requests/5
+        // POST: /requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRequest(int id, Request request)
+        [HttpPost]
+        public async Task<ActionResult<Request>> PostRequest(Request request)
         {
-            if (id != request.Id)
-            {
-                return BadRequest();
-            }
+            _context.Requests.Add(request);
+            await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetRequest", new { id = request.Id }, request);
+        }
+
+        // PUT: /requests
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        public async Task<IActionResult> PutRequest(Request request)
+        {
             _context.Entry(request).State = EntityState.Modified;
 
             try
@@ -69,7 +76,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestExists(id))
+                if (!RequestExists(request.Id))
                 {
                     return NotFound();
                 }
@@ -82,18 +89,9 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Requests
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Request>> PostRequest(Request request)
-        {
-            _context.Requests.Add(request);
-            await _context.SaveChangesAsync();
+       
 
-            return CreatedAtAction("GetRequest", new { id = request.Id }, request);
-        }
-
-        // DELETE: api/Requests/5
+        // DELETE: /requests/(id)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
@@ -107,6 +105,17 @@ namespace PRSBackEndPT.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // GET LIST OF REQUESTS FOR REVIEW 
+        [HttpGet("/list-review/{userId}")]
+        public async Task<ActionResult<IEnumerable<Request>>> GetAllForReview(int userId)
+
+        {
+            return await _context.Requests.Include(r => r.User)
+                .Where(r => r.Status.Equals("Review") && !r.UserId.Equals(userId)) 
+                .ToListAsync();
+
         }
 
         // APPROVE
@@ -155,6 +164,40 @@ namespace PRSBackEndPT.Controllers
             }
 
             request.Status = REJECTED;
+
+            _context.Entry(request).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RequestExists(request.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return request;
+        }
+
+        // REOPEN
+        [HttpPut("/reopen")]
+        public async Task<ActionResult<Request>> Reopen(Request reopenedRequest)
+        {
+            var request = await _context.Requests.FindAsync(reopenedRequest.Id);
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            request.Status = REOPENED;
 
             _context.Entry(request).State = EntityState.Modified;
 

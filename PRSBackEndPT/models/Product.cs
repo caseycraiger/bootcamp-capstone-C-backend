@@ -23,10 +23,10 @@ namespace PRSBackEndPT.models
 
         [StringLength(255)]
         public string? PhotoPath { get; set; }
-
+        
+        [JsonIgnore]
         public int VendorId { get; set; }
 
-        [JsonIgnore]
         public Vendor? Vendor { get; set; }
 
     }

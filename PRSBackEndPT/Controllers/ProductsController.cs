@@ -9,7 +9,7 @@ using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/products")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -20,38 +20,49 @@ namespace PRSBackEndPT.Controllers
             _context = context;
         }
 
-        // GET: api/Products
+        // GET: /products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products.Include(r => r.Vendor).ToListAsync();
         }
 
-        // GET: api/Products/5
+
+
+        // GET: /products/(id)
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            //var product = await _context.Products.FindAsync(id);
+
+            var product = await _context.Products.Where(r => r.Id == id)
+                .Include(r => r.Vendor)
+                .FirstOrDefaultAsync();
 
             if (product == null)
             {
                 return NotFound();
             }
-            product.Vendor = await _context.Vendors.FindAsync(product.VendorId);
 
             return product;
         }
 
-        // PUT: api/Products/5
+        // POST: /products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+        }
+
+        // PUT: /products
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        public async Task<IActionResult> PutProduct(Product product)
+        {
             _context.Entry(product).State = EntityState.Modified;
 
             try
@@ -60,7 +71,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(id))
+                if (!ProductExists(product.Id))
                 {
                     return NotFound();
                 }
@@ -73,18 +84,7 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
-        }
-
-        // DELETE: api/Products/5
+        // DELETE: /products/(id)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

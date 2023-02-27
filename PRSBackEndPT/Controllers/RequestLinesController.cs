@@ -9,7 +9,7 @@ using PRSBackEndPT.models;
 
 namespace PRSBackEndPT.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/request-lines")]
     [ApiController]
     public class RequestLinesController : ControllerBase
     {
@@ -20,14 +20,19 @@ namespace PRSBackEndPT.Controllers
             _context = context;
         }
 
-        // GET: api/RequestLines
+        // GET: /request-lines
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLine()
         {
-            return await _context.RequestLine.ToListAsync();
+            return await _context.RequestLine
+                .Include(r => r.Product)
+                .ThenInclude(product => product.Vendor)
+                .Include(r => r.Request)
+                .ThenInclude(request => request.User)
+                .ToListAsync();
         }
 
-        // GET: api/RequestLines/5
+        // GET: /request-lines/(id)
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestLine>> GetRequestLine(int id)
         {
@@ -42,16 +47,22 @@ namespace PRSBackEndPT.Controllers
             return requestLine;
         }
 
-        // PUT: api/RequestLines/5
+        // POST: /request-lines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRequestLine(int id, RequestLine requestLine)
+        [HttpPost]
+        public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
         {
-            if (id != requestLine.Id)
-            {
-                return BadRequest();
-            }
+            _context.RequestLine.Add(requestLine);
+            await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
+        }
+
+        // PUT: /request-lines
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        public async Task<IActionResult> PutRequestLine(RequestLine requestLine)
+        {
             _context.Entry(requestLine).State = EntityState.Modified;
 
             try
@@ -60,7 +71,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestLineExists(id))
+                if (!RequestLineExists(requestLine.Id))
                 {
                     return NotFound();
                 }
@@ -73,18 +84,9 @@ namespace PRSBackEndPT.Controllers
             return NoContent();
         }
 
-        // POST: api/RequestLines
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
-        {
-            _context.RequestLine.Add(requestLine);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
-        }
 
-        // DELETE: api/RequestLines/5
+        // DELETE: /request-lines/(id)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequestLine(int id)
         {
@@ -99,6 +101,20 @@ namespace PRSBackEndPT.Controllers
 
             return NoContent();
         }
+
+        // GET LIST OF REQUESTLINES BY REQUESTID
+        [HttpGet("/lines-for-request/{id}")]
+        public async Task<ActionResult<IEnumerable<RequestLine>>> GetByRequestId(int id)
+        {
+            return await _context.RequestLine
+                .Include(r => r.Product)
+                .ThenInclude(product => product.Vendor)
+                .Include(r => r.Request)
+                .ThenInclude(request => request.User)
+                .Where(r => r.RequestId.Equals(id))
+                .ToListAsync();
+        }
+
 
         private bool RequestLineExists(int id)
         {
