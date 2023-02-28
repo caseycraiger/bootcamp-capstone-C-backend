@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+
 builder.Services.AddDbContext<PrsDbContext>(
 options => options.UseSqlServer(builder.Configuration.GetConnectionString("PrsConnectionString"))
 );
@@ -25,6 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
 
 app.UseAuthorization();
 

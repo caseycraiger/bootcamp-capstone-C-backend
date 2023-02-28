@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -269,6 +270,12 @@ namespace PRSBackEndPT.Controllers
 
         private void Recalc()
         {
+            // not API
+            //methods called from APIs that make changes
+            // add a recalc method (requestID)
+            // total all the lines
+            // update Request.Total
+
             // sum up the request lines rl.Quantity rl.Product
             // update the request
             // save changes 

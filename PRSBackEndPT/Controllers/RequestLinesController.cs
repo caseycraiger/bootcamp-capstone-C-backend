@@ -25,10 +25,10 @@ namespace PRSBackEndPT.Controllers
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLine()
         {
             return await _context.RequestLine
-                .Include(r => r.Product)
-                .ThenInclude(product => product.Vendor)
                 .Include(r => r.Request)
                 .ThenInclude(request => request.User)
+                .Include(r => r.Product)
+                .ThenInclude(product => product.Vendor)
                 .ToListAsync();
         }
 

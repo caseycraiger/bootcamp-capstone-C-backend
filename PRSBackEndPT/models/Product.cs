@@ -26,7 +26,6 @@ namespace PRSBackEndPT.models
         
         [JsonIgnore]
         public int VendorId { get; set; }
-
         public Vendor? Vendor { get; set; }
 
     }
