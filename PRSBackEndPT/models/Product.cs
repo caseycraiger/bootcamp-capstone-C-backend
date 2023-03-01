@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace PRSBackEndPT.models
 {
+    [Index("PartNbr", IsUnique = true)]
     public class Product
     {
         [Key]
@@ -23,10 +26,11 @@ namespace PRSBackEndPT.models
 
         [StringLength(255)]
         public string? PhotoPath { get; set; }
-        
-        [JsonIgnore]
+
         public int VendorId { get; set; }
-        public Vendor? Vendor { get; set; }
+
+        [ForeignKey(nameof(VendorId))]
+        public Vendor Vendor { get; set; }
 
     }
 }

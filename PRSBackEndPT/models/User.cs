@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace PRSBackEndPT.models
 {
+    [Index("UserName", IsUnique = true)]
     public class User       // POCO
     {
         [Key]

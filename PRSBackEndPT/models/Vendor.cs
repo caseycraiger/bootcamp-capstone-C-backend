@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace PRSBackEndPT.models
 {
+    [Index("Code", IsUnique = true)]
     public class Vendor
     {
         [Key]

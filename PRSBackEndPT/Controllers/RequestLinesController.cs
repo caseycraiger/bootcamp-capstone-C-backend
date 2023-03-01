@@ -42,7 +42,10 @@ namespace PRSBackEndPT.Controllers
             {
                 return NotFound();
             }
+            requestLine.Request = await _context.Requests.FindAsync(requestLine.RequestId);
             requestLine.Product = await _context.Products.FindAsync(requestLine.ProductId);
+            requestLine.Product.Vendor = await _context.Vendors.FindAsync(requestLine.Product.VendorId);
+            requestLine.Request.User = await _context.Users.FindAsync(requestLine.Request.UserId);
 
             return requestLine;
         }
@@ -55,6 +58,9 @@ namespace PRSBackEndPT.Controllers
             _context.RequestLine.Add(requestLine);
             await _context.SaveChangesAsync();
 
+            //TODO: Maybe question mark in user breaking this?
+            //await RecalculateRequestTotal(requestLine.RequestId);
+
             return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
         }
 
@@ -64,10 +70,11 @@ namespace PRSBackEndPT.Controllers
         public async Task<IActionResult> PutRequestLine(RequestLine requestLine)
         {
             _context.Entry(requestLine).State = EntityState.Modified;
-
+            
             try
             {
                 await _context.SaveChangesAsync();
+                await RecalculateRequestTotal(requestLine.RequestId);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -80,7 +87,6 @@ namespace PRSBackEndPT.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -99,6 +105,8 @@ namespace PRSBackEndPT.Controllers
             _context.RequestLine.Remove(requestLine);
             await _context.SaveChangesAsync();
 
+            await RecalculateRequestTotal(requestLine.RequestId);
+
             return NoContent();
         }
 
@@ -115,6 +123,24 @@ namespace PRSBackEndPT.Controllers
                 .ToListAsync();
         }
 
+        private async Task<IActionResult> RecalculateRequestTotal(int requestId) //add a recalc method (requestID)
+        {
+            var total = await _context.RequestLine
+                .Where(rl => rl.RequestId == requestId)
+                .Include(rl => rl.Product)
+                .Select(rl => new { linetotal = rl.Quantity * rl.Product.Price }) // sum up the request lines rl.Quantity rl.Product
+                .SumAsync(s => s.linetotal);
+
+            var request = await _context.Requests.FindAsync(requestId);
+            request.User = await _context.Users.FindAsync(request.UserId);
+
+            request.Total = total; // update Request.Total
+            _context.Entry(request).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();   // save changes 
+
+            return NoContent();
+        }
 
         private bool RequestLineExists(int id)
         {

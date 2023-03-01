@@ -267,18 +267,5 @@ namespace PRSBackEndPT.Controllers
         {
             return _context.Requests.Any(e => e.Id == id);
         }
-
-        private void Recalc()
-        {
-            // not API
-            //methods called from APIs that make changes
-            // add a recalc method (requestID)
-            // total all the lines
-            // update Request.Total
-
-            // sum up the request lines rl.Quantity rl.Product
-            // update the request
-            // save changes 
-        }
     }
 }

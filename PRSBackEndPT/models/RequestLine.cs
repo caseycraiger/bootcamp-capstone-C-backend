@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.CodeAnalysis;
 
 namespace PRSBackEndPT.models
 {
@@ -9,17 +10,19 @@ namespace PRSBackEndPT.models
         [Key]
         public int Id { get; set; }
 
+        public int RequestId { get; set; }
+
+        public int ProductId { get; set; }
+
         public int Quantity { get; set; }
 
-        [JsonIgnore]
-        public int RequestId { get; set; }
-        public Request? Request { get; set; }
+        // foreign key
+        [ForeignKey(nameof(RequestId))]
+        public Request Request { get; set; }
 
-        [JsonIgnore]
-        public int ProductId { get; set; }
-        public Product? Product { get; set; }
-
-        public decimal Price { get; set; }
+        // foreign key
+        [ForeignKey(nameof(ProductId))]
+        public Product Product { get; set; }
 
     }
 }

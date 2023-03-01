@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,11 +30,11 @@ namespace PRSBackEndPT.models
 
         [Column(TypeName = "Decimal (11,2)")]
         public decimal Total { get; set; }
-        
-        // EF Relation property
-        // [ForeignKey(nameof(UserId))] // User - UserId
-        [JsonIgnore]
+
         public int UserId { get; set; }
+
+        // foreign key
+        [ForeignKey(nameof(UserId))]
         public User User { get; set; }
 
     }
