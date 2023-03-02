@@ -35,7 +35,7 @@ namespace PRSBackEndPT.models
 
         // foreign key
         [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
+        public User? User { get; set; }
 
     }
 }

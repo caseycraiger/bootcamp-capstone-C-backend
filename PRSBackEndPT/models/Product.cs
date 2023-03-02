@@ -30,7 +30,7 @@ namespace PRSBackEndPT.models
         public int VendorId { get; set; }
 
         [ForeignKey(nameof(VendorId))]
-        public Vendor Vendor { get; set; }
+        public Vendor? Vendor { get; set; }
 
     }
 }

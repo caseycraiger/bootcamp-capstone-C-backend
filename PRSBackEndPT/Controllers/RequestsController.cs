@@ -60,14 +60,16 @@ namespace PRSBackEndPT.Controllers
         {
             _context.Requests.Add(request);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRequest", new { id = request.Id }, request);
+            var createdRequest = await _context.Requests.Where(r => r.Id == request.Id)
+                .Include(r => r.User)
+                .FirstOrDefaultAsync();
+            return CreatedAtAction("GetRequest", new { id = createdRequest.Id }, createdRequest);
         }
 
         // PUT: /requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutRequest(Request request)
+        public async Task<ActionResult<Request>> PutRequest(Request request)
         {
             _context.Entry(request).State = EntityState.Modified;
 
@@ -86,8 +88,11 @@ namespace PRSBackEndPT.Controllers
                     throw;
                 }
             }
+            var updatedRequest = await _context.Requests.Where(r => r.Id == request.Id)
+              .Include(r => r.User)
+              .FirstOrDefaultAsync();
 
-            return NoContent();
+            return updatedRequest;
         }
 
        
@@ -121,18 +126,23 @@ namespace PRSBackEndPT.Controllers
 
         // APPROVE
         [HttpPut("/approve")] 
-        public async Task<ActionResult<Request>> Approve(Request approvedRequest)
+        public async Task<ActionResult<Request>> Approve(Request request)
         {
-            var request = await _context.Requests.FindAsync(approvedRequest.Id);
+            //var approvedRequest = await _context.Requests.FindAsync(approvedRequest.Id);
 
-            if (request == null)
+            var approvedRequest = await _context.Requests.Where(r => r.Id == request.Id)
+              .Include(r => r.User)
+              .FirstOrDefaultAsync();
+
+            if (approvedRequest == null)
             {
                 return NotFound();
             }
 
-            request.Status = APPROVED;
+            approvedRequest.Status = APPROVED;
 
-            _context.Entry(request).State = EntityState.Modified;
+            //_context.Entry((Request)approvedRequest).State = EntityState.Modified;
+            _context.Entry(approvedRequest).State = EntityState.Modified;
 
             try
             {
@@ -140,7 +150,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestExists(request.Id))
+                if (!RequestExists(approvedRequest.Id))
                 {
                     return NotFound();
                 }
@@ -150,23 +160,26 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return request;
+            return approvedRequest;
         }
 
         // REJECT
         [HttpPut("/reject")]
-        public async Task<ActionResult<Request>> Reject(Request rejectedRequest)
+        public async Task<ActionResult<Request>> Reject(Request request)
         {
-            var request = await _context.Requests.FindAsync(rejectedRequest.Id);
 
-            if (request == null)
+            var rejectedRequest = await _context.Requests.Where(r => r.Id == request.Id)
+              .Include(r => r.User)
+              .FirstOrDefaultAsync();
+
+            if (rejectedRequest == null)
             {
                 return NotFound();
             }
 
-            request.Status = REJECTED;
+            rejectedRequest.Status = REJECTED;
 
-            _context.Entry(request).State = EntityState.Modified;
+            _context.Entry(rejectedRequest).State = EntityState.Modified;
 
             try
             {
@@ -174,7 +187,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestExists(request.Id))
+                if (!RequestExists(rejectedRequest.Id))
                 {
                     return NotFound();
                 }
@@ -184,23 +197,25 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return request;
+            return rejectedRequest;
         }
 
         // REOPEN
         [HttpPut("/reopen")]
-        public async Task<ActionResult<Request>> Reopen(Request reopenedRequest)
+        public async Task<ActionResult<Request>> Reopen(Request request)
         {
-            var request = await _context.Requests.FindAsync(reopenedRequest.Id);
+            var reopenedRequest = await _context.Requests.Where(r => r.Id == request.Id)
+              .Include(r => r.User)
+              .FirstOrDefaultAsync();
 
-            if (request == null)
+            if (reopenedRequest == null)
             {
                 return NotFound();
             }
 
-            request.Status = REOPENED;
+            reopenedRequest.Status = REOPENED;
 
-            _context.Entry(request).State = EntityState.Modified;
+            _context.Entry(reopenedRequest).State = EntityState.Modified;
 
             try
             {
@@ -208,7 +223,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestExists(request.Id))
+                if (!RequestExists(reopenedRequest.Id))
                 {
                     return NotFound();
                 }
@@ -218,31 +233,33 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return request;
+            return reopenedRequest;
         }
 
         // SUBMIT
         [HttpPut("/submit")]
-        public async Task<ActionResult<Request>> Submit(Request submittedRequest)
+        public async Task<ActionResult<Request>> Submit(Request request)
         {
-            var request = await _context.Requests.FindAsync(submittedRequest.Id);
+            var submittedRequest = await _context.Requests.Where(r => r.Id == request.Id)
+              .Include(r => r.User)
+              .FirstOrDefaultAsync();
 
-            if (request == null)
+            if (submittedRequest == null)
             {
                 return NotFound();
             }
 
-            request.SubmittedDate = DateTime.Now;
+            submittedRequest.SubmittedDate = DateTime.Now;
 
-            if (request.Total > 50.00m) {
-                request.Status = REVIEW;
+            if (submittedRequest.Total > 50.00m) {
+                submittedRequest.Status = REVIEW;
             }
             else
             {
-                request.Status = APPROVED;
+                submittedRequest.Status = APPROVED;
             }
 
-            _context.Entry(request).State = EntityState.Modified;
+            _context.Entry(submittedRequest).State = EntityState.Modified;
 
             try
             {
@@ -250,7 +267,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestExists(request.Id))
+                if (!RequestExists(submittedRequest.Id))
                 {
                     return NotFound();
                 }
@@ -260,7 +277,7 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return request;
+            return submittedRequest;
         }
 
         private bool RequestExists(int id)

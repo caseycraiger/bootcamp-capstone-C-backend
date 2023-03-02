@@ -18,11 +18,11 @@ namespace PRSBackEndPT.models
 
         // foreign key
         [ForeignKey(nameof(RequestId))]
-        public Request Request { get; set; }
+        public Request? Request { get; set; }
 
         // foreign key
         [ForeignKey(nameof(ProductId))]
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
 
     }
 }

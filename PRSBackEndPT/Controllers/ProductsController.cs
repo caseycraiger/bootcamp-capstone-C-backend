@@ -54,14 +54,17 @@ namespace PRSBackEndPT.Controllers
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+            var createdProduct = await _context.Products.Where(r => r.Id == product.Id)
+                .Include(r => r.Vendor)
+                .FirstOrDefaultAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+            return CreatedAtAction("GetProduct", new { id = createdProduct.Id }, createdProduct);
         }
 
         // PUT: /products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutProduct(Product product)
+        public async Task<ActionResult<Product>> PutProduct(Product product)
         {
             _context.Entry(product).State = EntityState.Modified;
 
@@ -80,8 +83,11 @@ namespace PRSBackEndPT.Controllers
                     throw;
                 }
             }
+            var updatedProduct = await _context.Products.Where(r => r.Id == product.Id)
+                .Include(r => r.Vendor)
+                .FirstOrDefaultAsync();
 
-            return NoContent();
+            return updatedProduct;
         }
 
         // DELETE: /products/(id)

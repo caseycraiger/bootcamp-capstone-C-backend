@@ -25,10 +25,8 @@ namespace PRSBackEndPT.Controllers
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLine()
         {
             return await _context.RequestLine
-                .Include(r => r.Request)
-                .ThenInclude(request => request.User)
-                .Include(r => r.Product)
-                .ThenInclude(product => product.Vendor)
+                .Include(r => r.Request).ThenInclude(request => request.User)
+                .Include(r => r.Product).ThenInclude(product => product.Vendor)
                 .ToListAsync();
         }
 
@@ -36,16 +34,16 @@ namespace PRSBackEndPT.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestLine>> GetRequestLine(int id)
         {
-            var requestLine = await _context.RequestLine.FindAsync(id);
+            var requestLine = await _context.RequestLine
+               .Where(r => r.Id == id)
+               .Include(r => r.Request).ThenInclude(request => request.User)
+               .Include(r => r.Product).ThenInclude(product => product.Vendor)
+               .FirstOrDefaultAsync();
 
             if (requestLine == null)
             {
                 return NotFound();
             }
-            requestLine.Request = await _context.Requests.FindAsync(requestLine.RequestId);
-            requestLine.Product = await _context.Products.FindAsync(requestLine.ProductId);
-            requestLine.Product.Vendor = await _context.Vendors.FindAsync(requestLine.Product.VendorId);
-            requestLine.Request.User = await _context.Users.FindAsync(requestLine.Request.UserId);
 
             return requestLine;
         }
@@ -56,25 +54,30 @@ namespace PRSBackEndPT.Controllers
         public async Task<ActionResult<RequestLine>> PostRequestLine(RequestLine requestLine)
         {
             _context.RequestLine.Add(requestLine);
+
             await _context.SaveChangesAsync();
 
-            //TODO: Maybe question mark in user breaking this?
-            //await RecalculateRequestTotal(requestLine.RequestId);
+            await RecalculateRequestTotal(requestLine.RequestId);
 
-            return CreatedAtAction("GetRequestLine", new { id = requestLine.Id }, requestLine);
+            var createdRequestLine = await _context.RequestLine
+               .Where(r => r.Id == requestLine.Id)
+               .Include(r => r.Request).ThenInclude(request => request.User)
+               .Include(r => r.Product).ThenInclude(product => product.Vendor)
+               .FirstOrDefaultAsync();
+
+            return CreatedAtAction("GetRequestLine", new { id = createdRequestLine.Id }, createdRequestLine);
         }
 
         // PUT: /request-lines
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutRequestLine(RequestLine requestLine)
+        public async Task<ActionResult<RequestLine>> PutRequestLine(RequestLine requestLine)
         {
             _context.Entry(requestLine).State = EntityState.Modified;
             
             try
             {
                 await _context.SaveChangesAsync();
-                await RecalculateRequestTotal(requestLine.RequestId);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -87,7 +90,15 @@ namespace PRSBackEndPT.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            await RecalculateRequestTotal(requestLine.RequestId);
+
+            var updatedRequestLine = await _context.RequestLine
+                .Where(r => r.Id == requestLine.Id)
+                .Include(r => r.Request).ThenInclude(request => request.User)
+                .Include(r => r.Product).ThenInclude(product => product.Vendor)
+                .FirstOrDefaultAsync();
+
+            return updatedRequestLine;
         }
 
 
@@ -115,10 +126,8 @@ namespace PRSBackEndPT.Controllers
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetByRequestId(int id)
         {
             return await _context.RequestLine
-                .Include(r => r.Product)
-                .ThenInclude(product => product.Vendor)
-                .Include(r => r.Request)
-                .ThenInclude(request => request.User)
+                .Include(r => r.Product).ThenInclude(product => product.Vendor)
+                .Include(r => r.Request).ThenInclude(request => request.User)
                 .Where(r => r.RequestId.Equals(id))
                 .ToListAsync();
         }
@@ -141,7 +150,7 @@ namespace PRSBackEndPT.Controllers
 
             return NoContent();
         }
-
+        
         private bool RequestLineExists(int id)
         {
             return _context.RequestLine.Any(e => e.Id == id);
