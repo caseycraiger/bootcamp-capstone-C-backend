@@ -16,7 +16,7 @@ namespace PRSBackEndPT.models
 
         public int Quantity { get; set; }
 
-        // foreign key
+        // foreign key -- prevents loop between req and reqline
         [ForeignKey(nameof(RequestId))]
         public Request? Request { get; set; }
 

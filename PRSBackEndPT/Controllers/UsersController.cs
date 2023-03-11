@@ -24,7 +24,7 @@ namespace PRSBackEndPT.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> LoginUser([FromBody] UserPasswordObject upo)
         {
-            var user = await _context.Users.Where(u => u.UserName == upo.username && u.Password == upo.password).FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Username == upo.username && u.Password == upo.password).FirstOrDefaultAsync();
 
             if (user == null)
             {
@@ -69,9 +69,9 @@ namespace PRSBackEndPT.Controllers
         // PUT: /users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutUser(User user)
+        public async Task<ActionResult<User>> PutUser(User updatedUser)
         {
-            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(updatedUser).State = EntityState.Modified;
 
             try
             {
@@ -79,7 +79,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(user.Id))
+                if (!UserExists(updatedUser.Id))
                 {
                     return NotFound();
                 }
@@ -89,12 +89,12 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return NoContent();
+            return updatedUser;
         }
 
         // DELETE: /users/(id)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<ActionResult<User>> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -105,7 +105,7 @@ namespace PRSBackEndPT.Controllers
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return user;
         }
 
         private bool UserExists(int id)

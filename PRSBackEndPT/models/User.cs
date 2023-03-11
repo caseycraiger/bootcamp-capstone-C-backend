@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PRSBackEndPT.models
 {
-    [Index("UserName", IsUnique = true)]
+    [Index("Username", IsUnique = true)]
     public class User       // POCO
     {
         [Key]
         public int Id { get; set; }
 
         [StringLength(30)]
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
         [StringLength(30)]
         public string Password { get; set; }

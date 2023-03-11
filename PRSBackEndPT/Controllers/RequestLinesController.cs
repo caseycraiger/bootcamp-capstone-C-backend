@@ -105,7 +105,7 @@ namespace PRSBackEndPT.Controllers
 
         // DELETE: /request-lines/(id)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequestLine(int id)
+        public async Task<ActionResult<String>> DeleteRequestLine(int id)
         {
             var requestLine = await _context.RequestLine.FindAsync(id);
             if (requestLine == null)
@@ -118,7 +118,7 @@ namespace PRSBackEndPT.Controllers
 
             await RecalculateRequestTotal(requestLine.RequestId);
 
-            return NoContent();
+            return "RequestLine deleted";
         }
 
         // GET LIST OF REQUESTLINES BY REQUESTID
@@ -132,7 +132,7 @@ namespace PRSBackEndPT.Controllers
                 .ToListAsync();
         }
 
-        private async Task<IActionResult> RecalculateRequestTotal(int requestId) //add a recalc method (requestID)
+        private async Task RecalculateRequestTotal(int requestId) //add a recalc method (requestID)
         {
             var total = await _context.RequestLine
                 .Where(rl => rl.RequestId == requestId)
@@ -141,14 +141,11 @@ namespace PRSBackEndPT.Controllers
                 .SumAsync(s => s.linetotal);
 
             var request = await _context.Requests.FindAsync(requestId);
-            request.User = await _context.Users.FindAsync(request.UserId);
 
             request.Total = total; // update Request.Total
             _context.Entry(request).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();   // save changes 
-
-            return NoContent();
         }
         
         private bool RequestLineExists(int id)

@@ -26,9 +26,10 @@ namespace PRSBackEndPT.models
 
         [StringLength(255)]
         public string? PhotoPath { get; set; }
-
+        
         public int VendorId { get; set; }
 
+        // foreign key
         [ForeignKey(nameof(VendorId))]
         public Vendor? Vendor { get; set; }
 

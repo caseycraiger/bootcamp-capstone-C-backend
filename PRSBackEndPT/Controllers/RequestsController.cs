@@ -59,10 +59,12 @@ namespace PRSBackEndPT.Controllers
         public async Task<ActionResult<Request>> PostRequest(Request request)
         {
             _context.Requests.Add(request);
+            
             await _context.SaveChangesAsync();
             var createdRequest = await _context.Requests.Where(r => r.Id == request.Id)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync();
+                createdRequest.Status = NEW;
             return CreatedAtAction("GetRequest", new { id = createdRequest.Id }, createdRequest);
         }
 
@@ -99,7 +101,7 @@ namespace PRSBackEndPT.Controllers
 
         // DELETE: /requests/(id)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequest(int id)
+        public async Task<ActionResult<String>> DeleteRequest(int id)
         {
             var request = await _context.Requests.FindAsync(id);
             if (request == null)
@@ -110,7 +112,7 @@ namespace PRSBackEndPT.Controllers
             _context.Requests.Remove(request);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return "Request deleted";
         }
 
         // GET LIST OF REQUESTS FOR REVIEW 

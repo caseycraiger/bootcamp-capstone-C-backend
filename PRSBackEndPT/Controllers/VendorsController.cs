@@ -55,9 +55,9 @@ namespace PRSBackEndPT.Controllers
         // PUT: /vendors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public async Task<IActionResult> PutVendor(Vendor vendor)
+        public async Task<ActionResult<Vendor>> PutVendor(Vendor updatedVendor)
         {
-            _context.Entry(vendor).State = EntityState.Modified;
+            _context.Entry(updatedVendor).State = EntityState.Modified;
 
             try
             {
@@ -65,7 +65,7 @@ namespace PRSBackEndPT.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!VendorExists(vendor.Id))
+                if (!VendorExists(updatedVendor.Id))
                 {
                     return NotFound();
                 }
@@ -75,12 +75,12 @@ namespace PRSBackEndPT.Controllers
                 }
             }
 
-            return NoContent();
+            return updatedVendor;
         }
 
         // DELETE: vendors/(id)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVendor(int id)
+        public async Task<ActionResult<String>> DeleteVendor(int id)
         {
             var vendor = await _context.Vendors.FindAsync(id);
             if (vendor == null)
@@ -91,7 +91,7 @@ namespace PRSBackEndPT.Controllers
             _context.Vendors.Remove(vendor);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return "Vendor deleted";
         }
 
         private bool VendorExists(int id)

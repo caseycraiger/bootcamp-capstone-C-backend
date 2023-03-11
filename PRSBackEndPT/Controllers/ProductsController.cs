@@ -92,7 +92,7 @@ namespace PRSBackEndPT.Controllers
 
         // DELETE: /products/(id)
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<ActionResult<String>> DeleteProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
@@ -103,7 +103,7 @@ namespace PRSBackEndPT.Controllers
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return "Product deleted";
         }
 
         private bool ProductExists(int id)
